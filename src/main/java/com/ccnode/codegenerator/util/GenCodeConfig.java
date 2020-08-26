@@ -11,8 +11,8 @@ import java.util.Map;
  * Created by zhengjun.du on 2016/04/16 23:28
  */
 public class GenCodeConfig {
-    public static final String MAPPER_SUFFIX = "Dao";
-    public static final String DAO_SUFFIX = "Dao";
+    public static final String MAPPER_SUFFIX = "DAO";
+    public static final String DAO_SUFFIX = "DAO";
     public static final String SERVICE_SUFFIX = "Service";
     String projectPath = StringUtils.EMPTY;
     String serviceDir = StringUtils.EMPTY;

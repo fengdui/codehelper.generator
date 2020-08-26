@@ -26,6 +26,7 @@ public class GenMapperService {
     private final static Logger LOGGER = LoggerWrapper.getLogger(GenMapperService.class);
 
     private static String COMMA = ",";
+    private static String COMMA_AND_BLANK = ", ";
 
     public static void genMapper(GenCodeResponse response) {
         for (OnePojoInfo pojoInfo : response.getPojoInfos()) {
@@ -50,7 +51,7 @@ public class GenMapperService {
         }
 
         Pair<Integer, Integer> posPair = ReplaceUtil
-                .getPos(listInfo.getFullList(), "<resultMap id=\"AllColumnMap\" type=", "</resultMap>", new MapperCondition());
+                .getPos(listInfo.getFullList(), "<resultMap id=\"BaseResultMap\" type=", "</resultMap>", new MapperCondition());
         listInfo.setPos(posPair);
         listInfo.setNewSegments(genAllColumnMap(onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
@@ -66,7 +67,7 @@ public class GenMapperService {
         });
 
         posPair = ReplaceUtil
-                .getPos(listInfo.getFullList(), "<sql id=\"all_column\">", "</sql>", new MapperCondition());
+                .getPos(listInfo.getFullList(), "<sql id=\"baseColumn\">", "</sql>", new MapperCondition());
         listInfo.setPos(posPair);
         listInfo.setNewSegments(genAllColumn(onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
@@ -83,7 +84,60 @@ public class GenMapperService {
         });
 
         posPair = ReplaceUtil
-                .getPos(listInfo.getFullList(), "<insert id=\""+ MethodName.insert.name() +"\"", "</insert>", new MapperCondition());
+                .getPos(listInfo.getFullList(), "<sql id=\"page-limit\">", "</sql>", new MapperCondition());
+        listInfo.setPos(posPair);
+        listInfo.setNewSegments(getLimit(onePojoInfo));
+        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
+            @Override
+            public boolean isEqual(String o1, String o2) {
+                String match1 = RegexUtil.getMatch("[0-9A-Za-z_ ,]{1,100}", o1);
+                String match2 = RegexUtil.getMatch("[0-9A-Za-z_ ,]{1,100}", o2);
+                if(StringUtils.isBlank(match1) ){
+                    return false;
+                }
+                return match1.equals(match2);
+            }
+        });
+        fileInfo.setNewLines(listInfo.getFullList());
+
+        posPair = ReplaceUtil
+                .getPos(listInfo.getFullList(), "<sql id=\"qc\">", "</sql>", new MapperCondition());
+        listInfo.setPos(posPair);
+        listInfo.setNewSegments(getQC(onePojoInfo));
+        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
+            @Override
+            public boolean isEqual(String o1, String o2) {
+                //todo
+                String match1 = RegexUtil.getMatch("(.*)(.*)", o1);
+                String match2 = RegexUtil.getMatch("(.*).(.*)", o2);
+                if(StringUtils.isBlank(match1) ){
+                    return false;
+                }
+                return  match1.equals(match2);
+            }
+        });
+        fileInfo.setNewLines(listInfo.getFullList());
+
+        posPair = ReplaceUtil
+                .getPos(listInfo.getFullList(), "<sql id=\"set\">", "</sql>", new MapperCondition());
+        listInfo.setPos(posPair);
+        listInfo.setNewSegments(getSet(onePojoInfo));
+        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
+            @Override
+            public boolean isEqual(String o1, String o2) {
+                //todo
+                String match1 = RegexUtil.getMatch("(.*)(.*)", o1);
+                String match2 = RegexUtil.getMatch("(.*).(.*)", o2);
+                if(StringUtils.isBlank(match1) ){
+                    return false;
+                }
+                return  match1.equals(match2);
+            }
+        });
+        fileInfo.setNewLines(listInfo.getFullList());
+
+        posPair = ReplaceUtil
+                .getPos(listInfo.getFullList(), "<insert id=\""+ "add" +"\"", "</insert>", new MapperCondition());
         listInfo.setPos(posPair);
         listInfo.setNewSegments(genAddMethod(onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
@@ -100,8 +154,9 @@ public class GenMapperService {
 
         fileInfo.setNewLines(listInfo.getFullList());
 
+
         posPair = ReplaceUtil
-                .getPos(listInfo.getFullList(), "<insert id=\""+ MethodName.insertList.name() +"\"", "</insert>", new MapperCondition());
+                .getPos(listInfo.getFullList(), "<insert id=\""+ "batchInsert" +"\"", "</insert>", new MapperCondition());
         listInfo.setPos(posPair);
         listInfo.setNewSegments(genAddsMethod(onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
@@ -152,21 +207,6 @@ public class GenMapperService {
         });
         fileInfo.setNewLines(listInfo.getFullList());
 
-//        posPair = ReplaceUtil
-//                .getPos(listInfo.getFullList(), "<select id=\"queryUseStatement\"", "</select>", new MapperCondition());
-//        listInfo.setPos(posPair);
-//        listInfo.setNewSegments(genQueryUseStatementMethod(response,onePojoInfo,expand));
-//        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
-//            @Override
-//            public boolean isEqual(String o1, String o2) {
-//                String match1 = RegexUtil.getMatch("(.*)pojo.(.*)", o1);
-//                String match2 = RegexUtil.getMatch("(.*)pojo.(.*)", o2);
-//                if(StringUtils.isBlank(match1) ){
-//                    return false;
-//                }
-//                return match1.equals(match2);
-//            }
-//        });
         List<String> newList = listInfo.getFullList();
         newList = adjustList(newList);
         fileInfo.setNewLines(newList);
@@ -188,35 +228,29 @@ public class GenMapperService {
         List<String> retList = Lists.newArrayList();
         retList.add( "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
         retList.add( "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\" >") ;
-        retList.add("<mapper namespace=\"" + onePojoInfo.getDaoPackage() +"."+ onePojoInfo.getPojoName() + onePojoInfo.getSuffix() + "\">");
+        retList.add("<mapper namespace=\"" + "XX" +"."+ onePojoInfo.getPojoName().substring(0, onePojoInfo.getPojoName().length()-2) + onePojoInfo.getSuffix() + "\">");
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
         retList.add(
-                GenCodeUtil.ONE_RETRACT+ "<resultMap id=\"AllColumnMap\" type=\""+onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName()+"\">");
+                GenCodeUtil.ONE_RETRACT+ "<resultMap id=\"BaseResultMap\" type=\""+onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName()+"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</resultMap>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
         retList.add(GenCodeUtil.ONE_RETRACT+ "<sql id=\"all_column\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</sql>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
-        retList.add(GenCodeUtil.ONE_RETRACT+ "<insert id=\""+ MethodName.insert.name() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT+ "<sql id=\"page-limit\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
         retList.add(GenCodeUtil.ONE_RETRACT+ "<insert id=\""+ MethodName.insertList.name() +"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
         retList.add(GenCodeUtil.ONE_RETRACT+ "<update id=\""+ MethodName.update.name() +"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</update>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
         retList.add(GenCodeUtil.ONE_RETRACT+ "<select id=\""+ MethodName.select.name() +"\" resultMap=\"AllColumnMap\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</select>");
 
@@ -226,7 +260,6 @@ public class GenMapperService {
 //        retList.add(ONE_RETRACT+"</select>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add("<!--auto generated Code-->");
         retList.add(GenCodeUtil.ONE_RETRACT+ "<delete id=\""+ MethodName.delete.name() +"\">");
         retList.add(GenCodeUtil.TWO_RETRACT+ "DELETE FROM "+ GenCodeUtil.getUnderScore(onePojoInfo.getPojoName()) +" where id = #{id}");
         retList.add(GenCodeUtil.ONE_RETRACT+"</delete>");
@@ -237,7 +270,8 @@ public class GenMapperService {
     private static List<String> genAllColumnMap(OnePojoInfo onePojoInfo){
         List<String> retList = Lists.newArrayList();
         retList.add(
-                GenCodeUtil.ONE_RETRACT+ "<resultMap id=\"AllColumnMap\" type=\""+onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName()+"\">");
+                GenCodeUtil.ONE_RETRACT+ "<resultMap id=\"BaseResultMap\" type=\""+onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName()+"\">");
+        retList.add("<result column=\"id\" property=\"id\"/>");
         for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
             String fieldName = fieldInfo.getFieldName();
             retList.add(String.format("%s<result column=\"%s\" property=\"%s\"/>",
@@ -251,25 +285,74 @@ public class GenMapperService {
     private static List<String> genAllColumn(OnePojoInfo onePojoInfo) {
 
         List<String> retList = Lists.newArrayList();
-        retList.add( GenCodeUtil.ONE_RETRACT + "<sql id=\"all_column\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"baseColumn\">");
+        retList.add(GenCodeUtil.THREE_RETRACT + "<![CDATA[");
         int index = 0;
+        StringBuilder stringBuilder = new StringBuilder(GenCodeUtil.TWO_RETRACT);
         for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
-            String s = GenCodeUtil.TWO_RETRACT + GenCodeUtil.getUnderScore(fieldInfo.getFieldName()) +COMMA ;
+            String s = GenCodeUtil.getUnderScore(fieldInfo.getFieldName()) +COMMA_AND_BLANK ;
             if(index == onePojoInfo.getPojoFieldInfos().size() - 1){
-                s = s.replace(COMMA, StringUtils.EMPTY);
+                s = s.replace(COMMA_AND_BLANK, StringUtils.EMPTY);
             }
-            retList.add(s);
             index ++;
         }
+        retList.add(stringBuilder.toString());
+        retList.add(GenCodeUtil.THREE_RETRACT + "]]>");
         retList.add(GenCodeUtil.ONE_RETRACT + "</sql>");
         return retList;
 
     }
 
+    /**
+     *  <sql id="page-limit">
+     *         <if test="offset !=null and limit != null">
+     *             LIMIT #{offset},#{limit}
+     *         </if>
+     *     </sql>
+     * @param onePojoInfo
+     * @return
+     */
+    private static List<String> getLimit(OnePojoInfo onePojoInfo) {
+        List<String> retList = Lists.newArrayList();
+        retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"page-limit\">");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"offset !=null and limit != null\">");
+        retList.add(GenCodeUtil.THREE_RETRACT + "LIMIT #{offset},#{limit}");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</if>");
+        retList.add(GenCodeUtil.ONE_RETRACT + "");
+        return retList;
+    }
+
+    private static List<String> getQC(OnePojoInfo onePojoInfo) {
+        List<String> retList = Lists.newArrayList();
+        retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"qc\">");
+        for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
+            String fieldName = fieldInfo.getFieldName();
+            String testCondition = GenCodeUtil.TWO_RETRACT +  String.format("<if test=\"%s != null\">",fieldName);
+            String updateField =  String.format("AND %s = #{%s}", GenCodeUtil.getUnderScore(fieldName), fieldName);
+            retList.add(testCondition + " " + updateField + " " + "</if>");
+
+        }
+        retList.add(GenCodeUtil.ONE_RETRACT + "</sql>");
+        return retList;
+    }
+
+    private static List<String> getSet(OnePojoInfo onePojoInfo) {
+        List<String> retList = Lists.newArrayList();
+        retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"qc\">");
+        for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
+            String fieldName = fieldInfo.getFieldName();
+            String s = GenCodeUtil.THREE_RETRACT + String.format("<if test=\"%s != null\"> #{%s}, </if>"
+                    ,fieldName,fieldName);
+            retList.add(s);
+        }
+        retList.add(GenCodeUtil.ONE_RETRACT + "</sql>");
+        return retList;
+    }
+
     private static List<String> genAddMethod(OnePojoInfo onePojoInfo ) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
-        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=\""+ MethodName.insert.name() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\""+ MethodName.insert.name() +"\">");
         retList.add(GenCodeUtil.TWO_RETRACT + "INSERT INTO " + tableName );
         retList.add(GenCodeUtil.TWO_RETRACT + "<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">");
         for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
@@ -362,13 +445,13 @@ public class GenMapperService {
     private static List<String> genSelectMethod(GenCodeResponse response, OnePojoInfo onePojoInfo) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
-        retList.add( GenCodeUtil.ONE_RETRACT + "<select id=\""+ MethodName.select.name() +"\" resultMap=\"AllColumnMap\">");
+        retList.add( GenCodeUtil.ONE_RETRACT + "<select id=\""+ MethodName.select.name() +"\" resultMap=\"BaseResultMap\">");
         if(GenCodeResponseHelper.isUseGenericDao(response)){
             retList.add(GenCodeUtil.TWO_RETRACT + "SELECT"  );
             retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"option.selectCount == 'TRUE'\"> COUNT(1) AS id </if>"  );
-            retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"option.selectCount != 'TRUE'\"> <include refid=\"all_column\"/> </if>" );
+            retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"option.selectCount != 'TRUE'\"> <include refid=\"baseColumn\"/> </if>" );
         }else{
-            retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"all_column\"/>"  );
+            retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"baseColumn\"/>"  );
         }
         retList.add(GenCodeUtil.TWO_RETRACT + "FROM " + tableName  );
         retList.add(GenCodeUtil.TWO_RETRACT + "<where>");
