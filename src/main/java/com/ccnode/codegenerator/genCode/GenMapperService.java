@@ -184,12 +184,44 @@ public class GenMapperService {
                 return  match1.equals(match2);
             }
         });
-
         fileInfo.setNewLines(listInfo.getFullList());
 
+        posPair = ReplaceUtil
+                .getPos(listInfo.getFullList(), "<select id=\"list\"", "</select>", new MapperCondition());
+        listInfo.setPos(posPair);
+        listInfo.setNewSegments(genSelectMethod(response,onePojoInfo));
+        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
+            @Override
+            public boolean isEqual(String o1, String o2) {
+                String match1 = RegexUtil.getMatch("(.*)pojo.(.*)", o1);
+                String match2 = RegexUtil.getMatch("(.*)pojo.(.*)", o2);
+                if(StringUtils.isBlank(match1) ){
+                    return false;
+                }
+                return  match1.equals(match2);
+            }
+        });
+        fileInfo.setNewLines(listInfo.getFullList());
 
         posPair = ReplaceUtil
-                .getPos(listInfo.getFullList(), "<select id=\""+ MethodName.select.name() +"\"", "</select>", new MapperCondition());
+                .getPos(listInfo.getFullList(), "<select id=\"countByQc\"", "</select>", new MapperCondition());
+        listInfo.setPos(posPair);
+        listInfo.setNewSegments(genSelectMethod(response,onePojoInfo));
+        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
+            @Override
+            public boolean isEqual(String o1, String o2) {
+                String match1 = RegexUtil.getMatch("(.*)pojo.(.*)", o1);
+                String match2 = RegexUtil.getMatch("(.*)pojo.(.*)", o2);
+                if(StringUtils.isBlank(match1) ){
+                    return false;
+                }
+                return  match1.equals(match2);
+            }
+        });
+        fileInfo.setNewLines(listInfo.getFullList());
+
+        posPair = ReplaceUtil
+                .getPos(listInfo.getFullList(), "<select id=\"getByQc\"", "</select>", new MapperCondition());
         listInfo.setPos(posPair);
         listInfo.setNewSegments(genSelectMethod(response,onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
@@ -303,6 +335,7 @@ public class GenMapperService {
             if(index == onePojoInfo.getPojoFieldInfos().size() - 1){
                 s = s.replace(COMMA_AND_BLANK, StringUtils.EMPTY);
             }
+            stringBuilder.append(s);
             index ++;
         }
         retList.add(stringBuilder.toString());
@@ -426,31 +459,54 @@ public class GenMapperService {
     private static List<String> genSelectMethod(GenCodeResponse response, OnePojoInfo onePojoInfo) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
-        retList.add( GenCodeUtil.ONE_RETRACT + "<select id=\""+ MethodName.select.name() +"\" resultMap=\"BaseResultMap\">");
-        if(GenCodeResponseHelper.isUseGenericDao(response)){
-            retList.add(GenCodeUtil.TWO_RETRACT + "SELECT"  );
-            retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"option.selectCount == 'TRUE'\"> COUNT(1) AS id </if>"  );
-            retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"option.selectCount != 'TRUE'\"> <include refid=\"baseColumn\"/> </if>" );
-        }else{
-            retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"baseColumn\"/>"  );
-        }
+        retList.add(GenCodeUtil.ONE_RETRACT + "<select id=\"list\" parameterType=\"QC\" resultMap=\"BaseResultMap\">");
+        retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"baseColumn\"/>"  );
         retList.add(GenCodeUtil.TWO_RETRACT + "FROM " + tableName  );
         retList.add(GenCodeUtil.TWO_RETRACT + "<where>");
-        for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
-            String fieldName = fieldInfo.getFieldName();
-            String testCondition = GenCodeUtil.THREE_RETRACT +  String.format("<if test=\"pojo.%s != null\">",fieldName);
-            String updateField =  String.format("AND %s = #{pojo.%s}", GenCodeUtil.getUnderScore(fieldName), fieldName);
-            retList.add(testCondition + " " + updateField + " " + "</if>");
-
-        }
+        retList.add(GenCodeUtil.THREE_RETRACT + "`is_deleted` = \"N\"");
+        retList.add(GenCodeUtil.THREE_RETRACT + "<include refid=\"qc\"/>");
         retList.add(GenCodeUtil.TWO_RETRACT + "</where>");
-        if(GenCodeResponseHelper.isUseGenericDao(response)){
-            retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"option.orderDesc == 'TRUE'\"> ORDER BY id DESC </if>");
-            retList.add(GenCodeUtil.TWO_RETRACT + "LIMIT #{option.limit}");
-            retList.add(GenCodeUtil.TWO_RETRACT + "OFFSET #{option.offset}");
-        }else{
-            retList.add(GenCodeUtil.TWO_RETRACT + "LIMIT 1000 ");
-        }
+        retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"orderBy != null\">");
+        retList.add(GenCodeUtil.THREE_RETRACT + "ORDER BY ${orderBy}");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</if>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<include refid=\"page-limit\"/>");
+        retList.add(GenCodeUtil.ONE_RETRACT + "</select>");
+        return retList;
+    }
+
+
+    private static List<String> genCountQC(GenCodeResponse response, OnePojoInfo onePojoInfo) {
+        List<String> retList = Lists.newArrayList();
+        String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
+        retList.add( GenCodeUtil.ONE_RETRACT + "<select id=\"countByQc\" parameterType=\"QC\" resultMap=\"BaseResultMap\">");
+        retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"baseColumn\"/>"  );
+        retList.add(GenCodeUtil.TWO_RETRACT + "FROM " + tableName  );
+        retList.add(GenCodeUtil.TWO_RETRACT + "<where>");
+        retList.add(GenCodeUtil.THREE_RETRACT + "`is_deleted` = \"N\"");
+        retList.add(GenCodeUtil.THREE_RETRACT + "<include refid=\"qc\"/>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</where>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"orderBy != null\">");
+        retList.add(GenCodeUtil.THREE_RETRACT + "ORDER BY ${orderBy}");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</if>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<include refid=\"page-limit\"/>");
+        retList.add(GenCodeUtil.ONE_RETRACT + "</select>");
+        return retList;
+    }
+
+    private static List<String> genGetQC(GenCodeResponse response, OnePojoInfo onePojoInfo) {
+        List<String> retList = Lists.newArrayList();
+        String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
+        retList.add( GenCodeUtil.ONE_RETRACT + "<select id=\"countByQc\" parameterType=\"QC\" resultMap=\"BaseResultMap\">");
+        retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"baseColumn\"/>"  );
+        retList.add(GenCodeUtil.TWO_RETRACT + "FROM " + tableName  );
+        retList.add(GenCodeUtil.TWO_RETRACT + "<where>");
+        retList.add(GenCodeUtil.THREE_RETRACT + "`is_deleted` = \"N\"");
+        retList.add(GenCodeUtil.THREE_RETRACT + "<include refid=\"qc\"/>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</where>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"orderBy != null\">");
+        retList.add(GenCodeUtil.THREE_RETRACT + "ORDER BY ${orderBy}");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</if>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<include refid=\"page-limit\"/>");
         retList.add(GenCodeUtil.ONE_RETRACT + "</select>");
         return retList;
     }
