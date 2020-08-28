@@ -90,12 +90,10 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("[0-9A-Za-z_ ,]{1,100}", o1);
-                String match2 = RegexUtil.getMatch("[0-9A-Za-z_ ,]{1,100}", o2);
-                if(StringUtils.isBlank(match1) ){
+                if(StringUtils.isBlank(o1) ){
                     return false;
                 }
-                return match1.equals(match2);
+                return o1.equals(o2);
             }
         });
         fileInfo.setNewLines(listInfo.getFullList());
@@ -107,7 +105,6 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                //todo
                 String match1 = RegexUtil.getMatch("(.*)(.*)", o1);
                 String match2 = RegexUtil.getMatch("(.*).(.*)", o2);
                 if(StringUtils.isBlank(match1) ){
@@ -125,7 +122,6 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                //todo
                 String match1 = RegexUtil.getMatch("(.*)(.*)", o1);
                 String match2 = RegexUtil.getMatch("(.*).(.*)", o2);
                 if(StringUtils.isBlank(match1) ){
@@ -176,8 +172,8 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("#\\{pojo.(.*)\\}", o1);
-                String match2 = RegexUtil.getMatch("#\\{pojo.(.*)\\}", o2);
+                String match1 = RegexUtil.getMatch("#\\{item.(.*)\\}", o1);
+                String match2 = RegexUtil.getMatch("#\\{item.(.*)\\}", o2);
                 if(StringUtils.isBlank(match1) ){
                     return false;
                 }
@@ -193,12 +189,10 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("(.*)pojo.(.*)", o1);
-                String match2 = RegexUtil.getMatch("(.*)pojo.(.*)", o2);
-                if(StringUtils.isBlank(match1) ){
+                if(StringUtils.isBlank(o1) ){
                     return false;
                 }
-                return  match1.equals(match2);
+                return o1.equals(o2);
             }
         });
         fileInfo.setNewLines(listInfo.getFullList());
@@ -206,16 +200,14 @@ public class GenMapperService {
         posPair = ReplaceUtil
                 .getPos(listInfo.getFullList(), "<select id=\"countByQc\"", "</select>", new MapperCondition());
         listInfo.setPos(posPair);
-        listInfo.setNewSegments(genSelectMethod(response,onePojoInfo));
+        listInfo.setNewSegments(genCountQC(response,onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("(.*)pojo.(.*)", o1);
-                String match2 = RegexUtil.getMatch("(.*)pojo.(.*)", o2);
-                if(StringUtils.isBlank(match1) ){
+                if(StringUtils.isBlank(o1) ){
                     return false;
                 }
-                return  match1.equals(match2);
+                return o1.equals(o2);
             }
         });
         fileInfo.setNewLines(listInfo.getFullList());
@@ -223,16 +215,14 @@ public class GenMapperService {
         posPair = ReplaceUtil
                 .getPos(listInfo.getFullList(), "<select id=\"getByQc\"", "</select>", new MapperCondition());
         listInfo.setPos(posPair);
-        listInfo.setNewSegments(genSelectMethod(response,onePojoInfo));
+        listInfo.setNewSegments(genGetQC(response,onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("(.*)pojo.(.*)", o1);
-                String match2 = RegexUtil.getMatch("(.*)pojo.(.*)", o2);
-                if(StringUtils.isBlank(match1) ){
+                if(StringUtils.isBlank(o1) ){
                     return false;
                 }
-                return  match1.equals(match2);
+                return o1.equals(o2);
             }
         });
         fileInfo.setNewLines(listInfo.getFullList());
@@ -327,7 +317,7 @@ public class GenMapperService {
 
         List<String> retList = Lists.newArrayList();
         retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"baseColumn\">");
-        retList.add(GenCodeUtil.THREE_RETRACT + "<![CDATA[");
+//        retList.add(GenCodeUtil.THREE_RETRACT + "<![CDATA[");
         int index = 0;
         StringBuilder stringBuilder = new StringBuilder(GenCodeUtil.TWO_RETRACT);
         for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
@@ -339,7 +329,7 @@ public class GenMapperService {
             index ++;
         }
         retList.add(stringBuilder.toString());
-        retList.add(GenCodeUtil.THREE_RETRACT + "]]>");
+//        retList.add(GenCodeUtil.THREE_RETRACT + "]]>");
         retList.add(GenCodeUtil.ONE_RETRACT + "</sql>");
         return retList;
 
@@ -433,7 +423,7 @@ public class GenMapperService {
     private static List<String> genAddsMethod(OnePojoInfo onePojoInfo) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
-        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=batchInsert>");
+        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=\"batchInsert\">");
         retList.add(GenCodeUtil.TWO_RETRACT + "INSERT INTO " + tableName + "(");
         retList.add(GenCodeUtil.TWO_RETRACT + "<include refid=\"baseColumn\"/>");
         retList.add(GenCodeUtil.TWO_RETRACT + ")VALUES");
@@ -479,16 +469,12 @@ public class GenMapperService {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getPojoClassSimpleName());
         retList.add( GenCodeUtil.ONE_RETRACT + "<select id=\"countByQc\" parameterType=\"QC\" resultMap=\"BaseResultMap\">");
-        retList.add(GenCodeUtil.TWO_RETRACT + "SELECT <include refid=\"baseColumn\"/>"  );
+        retList.add(GenCodeUtil.TWO_RETRACT + "SELECT COUNT(1)"  );
         retList.add(GenCodeUtil.TWO_RETRACT + "FROM " + tableName  );
         retList.add(GenCodeUtil.TWO_RETRACT + "<where>");
         retList.add(GenCodeUtil.THREE_RETRACT + "`is_deleted` = \"N\"");
         retList.add(GenCodeUtil.THREE_RETRACT + "<include refid=\"qc\"/>");
         retList.add(GenCodeUtil.TWO_RETRACT + "</where>");
-        retList.add(GenCodeUtil.TWO_RETRACT + "<if test=\"orderBy != null\">");
-        retList.add(GenCodeUtil.THREE_RETRACT + "ORDER BY ${orderBy}");
-        retList.add(GenCodeUtil.TWO_RETRACT + "</if>");
-        retList.add(GenCodeUtil.TWO_RETRACT + "<include refid=\"page-limit\"/>");
         retList.add(GenCodeUtil.ONE_RETRACT + "</select>");
         return retList;
     }
