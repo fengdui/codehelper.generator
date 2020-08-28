@@ -51,21 +51,21 @@ public class GenCodeService {
             }
             LOGGER.info("UserConfigService.initPojos done");
 
-            GenSqlService.genSQL(response);
-            if(response.checkFailure()){
-                return response;
-            }
-            LOGGER.info("UserConfigService.genSQL done");
-            GenDaoService.genDAO(response);
-            if(response.checkFailure()){
-                return response;
-            }
-            LOGGER.info("UserConfigService.genDao done");
-            GenServiceService.genService(response);
-            if(response.checkFailure()){
-                return response;
-            }
-            LOGGER.info("UserConfigService.genService done");
+//            GenSqlService.genSQL(response);
+//            if(response.checkFailure()){
+//                return response;
+//            }
+//            LOGGER.info("UserConfigService.genSQL done");
+//            GenDaoService.genDAO(response);
+//            if(response.checkFailure()){
+//                return response;
+//            }
+//            LOGGER.info("UserConfigService.genDao done");
+//            GenServiceService.genService(response);
+//            if(response.checkFailure()){
+//                return response;
+//            }
+//            LOGGER.info("UserConfigService.genService done");
             GenMapperService.genMapper(response);
             if(response.checkFailure()){
                 return response;
