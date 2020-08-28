@@ -105,12 +105,10 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("(.*)(.*)", o1);
-                String match2 = RegexUtil.getMatch("(.*).(.*)", o2);
-                if(StringUtils.isBlank(match1) ){
+                if(StringUtils.isBlank(o1) ){
                     return false;
                 }
-                return  match1.equals(match2);
+                return o1.equals(o2);
             }
         });
         fileInfo.setNewLines(listInfo.getFullList());
@@ -122,12 +120,10 @@ public class GenMapperService {
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {
-                String match1 = RegexUtil.getMatch("(.*)(.*)", o1);
-                String match2 = RegexUtil.getMatch("(.*).(.*)", o2);
-                if(StringUtils.isBlank(match1) ){
+                if(StringUtils.isBlank(o1) ){
                     return false;
                 }
-                return  match1.equals(match2);
+                return o1.equals(o2);
             }
         });
         fileInfo.setNewLines(listInfo.getFullList());
