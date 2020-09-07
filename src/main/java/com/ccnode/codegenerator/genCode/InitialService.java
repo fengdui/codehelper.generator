@@ -62,10 +62,10 @@ public class InitialService {
                 for (PojoFieldInfo pojoFieldInfo : pojoFieldInfos) {
                     concat += "|"+pojoFieldInfo.getFieldName();
                 }
-                if(!concat.contains("id")){
-                    LOGGER.error(pojoName + " should has 'id' field");
-                    return response.failure(pojoName + " should has 'id' field");
-                }
+//                if(!concat.contains("id")){
+//                    LOGGER.error(pojoName + " should has 'id' field");
+//                    return response.failure(pojoName + " should has 'id' field");
+//                }
                 OnePojoInfoHelper.parseFiles(onePojoInfo,response);
                 OnePojoInfoHelper.deduceDaoPackage(onePojoInfo, response);
                 OnePojoInfoHelper.deduceServicePackage(onePojoInfo, response);
