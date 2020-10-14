@@ -285,11 +285,11 @@ public class GenMapperService {
         retList.add(GenCodeUtil.ONE_RETRACT+"</sql>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"add\" parameterType="+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"add\" parameterType=\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add(GenCodeUtil.ONE_RETRACT + "<update id=\"update\" parameterType="+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<update id=\"update\" parameterType=\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</update>");
 
         retList.add(StringUtils.EMPTY);
@@ -386,7 +386,7 @@ public class GenMapperService {
         retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"set\">");
         for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
             String fieldName = fieldInfo.getFieldName();
-            String s = GenCodeUtil.THREE_RETRACT + String.format("<if test=\"%s != null\">%s = #{%s}, </if>"
+            String s = GenCodeUtil.TWO_RETRACT + String.format("<if test=\"%s != null\">%s = #{%s}, </if>"
                     ,fieldName, GenCodeUtil.getUnderScore(fieldName), fieldName);
             retList.add(s);
         }
@@ -399,7 +399,7 @@ public class GenMapperService {
         retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"batchSet\">");
         for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
             String fieldName = fieldInfo.getFieldName();
-            String s = GenCodeUtil.THREE_RETRACT + String.format("<if test=\"item.%s != null\">%s = #{item.%s}, </if>"
+            String s = GenCodeUtil.TWO_RETRACT + String.format("<if test=\"item.%s != null\">%s = #{item.%s}, </if>"
                     ,fieldName, GenCodeUtil.getUnderScore(fieldName), fieldName);
             retList.add(s);
         }
@@ -410,8 +410,7 @@ public class GenMapperService {
     private static List<String> genAddMethod(OnePojoInfo onePojoInfo ) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getTableName());
-        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"add\" parameterType=" +
-                "\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"add\" parameterType=" + "\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
         retList.add(GenCodeUtil.TWO_RETRACT + "INSERT INTO " + tableName );
         retList.add(GenCodeUtil.TWO_RETRACT + "<set>");
 //        for (PojoFieldInfo fieldInfo : onePojoInfo.getPojoFieldInfos()) {
@@ -437,8 +436,7 @@ public class GenMapperService {
     private static List<String> genUpdateMethod(OnePojoInfo onePojoInfo ) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getTableName());
-        retList.add(GenCodeUtil.ONE_RETRACT + "<update id=\"update\" parameterType=\""
-                + onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<update id=\"update\" parameterType=\"" + onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
         retList.add(GenCodeUtil.TWO_RETRACT + "UPDATE INTO " + tableName );
         retList.add(GenCodeUtil.TWO_RETRACT + "<set>");
         retList.add(GenCodeUtil.THREE_RETRACT + "<include refid=\"set\"/>");

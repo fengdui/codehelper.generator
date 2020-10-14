@@ -242,18 +242,18 @@ public class OnePojoInfoHelper {
             file.setFileType(fileType);
             String filePath = StringUtils.EMPTY;
             switch (fileType){
-             case SQL:
-                 filePath = onePojoInfo.getFullSqlPath();
-                break;
+//             case SQL:
+//                 filePath = onePojoInfo.getFullSqlPath();
+//                break;
             case MAPPER:
                  filePath = onePojoInfo.getFullMapperPath();
                 break;
-            case SERVICE:
-                 filePath = onePojoInfo.getFullServicePath();
-                break;
-            case DAO:
-                 filePath = onePojoInfo.getFullDaoPath();
-                break;
+//            case SERVICE:
+//                 filePath = onePojoInfo.getFullServicePath();
+//                break;
+//            case DAO:
+//                 filePath = onePojoInfo.getFullDaoPath();
+//                break;
             }
             file.setFilePath(filePath);
             file.setFile(new File(file.getFilePath()));
