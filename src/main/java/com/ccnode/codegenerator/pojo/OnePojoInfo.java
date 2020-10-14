@@ -185,4 +185,9 @@ public class OnePojoInfo {
     public void setIdType(String idType) {
         this.idType = idType;
     }
+
+    public String getTableName() {
+        return pojoClassSimpleName.endsWith("DO")? pojoClassSimpleName.substring(0, pojoClassSimpleName.length()-2) :
+                pojoClassSimpleName.endsWith("Do")? pojoClassSimpleName.substring(0, pojoClassSimpleName.length()-2) : pojoClassSimpleName;
+    }
 }
