@@ -281,6 +281,10 @@ public class GenMapperService {
         retList.add(GenCodeUtil.ONE_RETRACT+"</sql>");
 
         retList.add(StringUtils.EMPTY);
+        retList.add(GenCodeUtil.ONE_RETRACT + "<sql id=\"batchSet\">");
+        retList.add(GenCodeUtil.ONE_RETRACT+"</sql>");
+
+        retList.add(StringUtils.EMPTY);
         retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"add\" parameterType="+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
 
