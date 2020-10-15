@@ -314,8 +314,8 @@ public class GenMapperService {
         retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=\"batchUpdate\"> parameterType=\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
-        retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
+        retList.add( GenCodeUtil.ONE_RETRACT + "<update id=\"batchUpdate\"> parameterType=\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() + "\">");
+        retList.add(GenCodeUtil.ONE_RETRACT+"</update>");
 
         retList.add(StringUtils.EMPTY);
         retList.add(GenCodeUtil.ONE_RETRACT+ "<select id=\"list\" parameterType=\"QC\" resultMap=\"BaseResultMap\">");
