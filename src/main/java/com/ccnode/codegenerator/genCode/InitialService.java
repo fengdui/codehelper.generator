@@ -3,6 +3,7 @@ package com.ccnode.codegenerator.genCode;
 import com.ccnode.codegenerator.exception.BizException;
 import com.ccnode.codegenerator.pojo.GenCodeResponse;
 import com.ccnode.codegenerator.pojoHelper.OnePojoInfoHelper;
+import com.ccnode.codegenerator.util.GenCodeUtil;
 import com.ccnode.codegenerator.util.IOUtils;
 import com.ccnode.codegenerator.util.LoggerWrapper;
 import com.ccnode.codegenerator.exception.BizException;
@@ -50,7 +51,7 @@ public class InitialService {
                 onePojoInfo.setFullDaoPath(genPath(response, pojoDirPath, config.getDaoDir(), pojoName,(config.getDaoSuffix() == null ? GenCodeConfig.DAO_SUFFIX:config.getDaoSuffix()) + ".java"));
                 onePojoInfo.setFullServicePath(genPath(response, pojoDirPath, config.getServiceDir(), pojoName,(config.getServiceSuffix() == null ? GenCodeConfig.SERVICE_SUFFIX:config.getServiceSuffix()) + ".java"));
                 onePojoInfo.setFullSqlPath(genPath(response, pojoDirPath, config.getSqlDir(), pojoName,".sql"));
-                onePojoInfo.setFullMapperPath(genPath(response, pojoDirPath, config.getMapperDir(), pojoName,(config.getMapperSuffix() == null ? GenCodeConfig.MAPPER_SUFFIX:config.getMapperSuffix()) + ".xml"));
+                onePojoInfo.setFullMapperPath(genPath(response, pojoDirPath, config.getMapperDir(), pojoName, ".xml"));
                 onePojoInfo.setFullPojoPath(fullPojoPath);
                 OnePojoInfoHelper.parseIdeaFieldInfo(onePojoInfo, response);
                 // todo fix daoPackage Bug
@@ -83,7 +84,8 @@ public class InitialService {
 
     private static String genPath(GenCodeResponse response, String pojoDirPath, String configDir, String pojoName, String fileSuffix) {
         String projectPath = GenCodeResponseHelper.getProjectPathWithSplitter(response);
-        File file = IOUtils.matchOnlyOneFile(projectPath, pojoName + fileSuffix);
+        pojoName = pojoName.toLowerCase().endsWith("do") ? pojoName.substring(0, pojoName.length()-2) : pojoName;
+        File file = IOUtils.matchOnlyOneFile(projectPath, GenCodeUtil.getUnderScore(pojoName) + fileSuffix);
         if(file != null){
             return file.getAbsolutePath();
         }

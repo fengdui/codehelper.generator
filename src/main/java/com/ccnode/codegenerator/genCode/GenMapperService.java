@@ -193,6 +193,23 @@ public class GenMapperService {
         fileInfo.setNewLines(listInfo.getFullList());
 
         posPair = ReplaceUtil
+                .getPos(listInfo.getFullList(), "<update id=\""+ "batchUpdate" +"\"", "</update>", new MapperCondition());
+        listInfo.setPos(posPair);
+        listInfo.setNewSegments(genBatchInsertMethod(onePojoInfo));
+        ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
+            @Override
+            public boolean isEqual(String o1, String o2) {
+                String match1 = RegexUtil.getMatch("#\\{item.(.*)\\}", o1);
+                String match2 = RegexUtil.getMatch("#\\{item.(.*)\\}", o2);
+                if(StringUtils.isBlank(match1) ){
+                    return false;
+                }
+                return  match1.equals(match2);
+            }
+        });
+        fileInfo.setNewLines(listInfo.getFullList());
+
+        posPair = ReplaceUtil
                 .getPos(listInfo.getFullList(), "<select id=\"list\"", "</select>", new MapperCondition());
         listInfo.setPos(posPair);
         listInfo.setNewSegments(genSelectMethod(response,onePojoInfo));
@@ -293,7 +310,11 @@ public class GenMapperService {
         retList.add(GenCodeUtil.ONE_RETRACT+"</update>");
 
         retList.add(StringUtils.EMPTY);
-        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=\"batchInsert\">");
+        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=\"batchInsert\" parameterType=\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
+        retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
+
+        retList.add(StringUtils.EMPTY);
+        retList.add( GenCodeUtil.ONE_RETRACT + "<insert id=\"batchUpdate\"> parameterType=\""+ onePojoInfo.getPojoPackage() +"." + onePojoInfo.getPojoName() +"\">");
         retList.add(GenCodeUtil.ONE_RETRACT+"</insert>");
 
         retList.add(StringUtils.EMPTY);
@@ -479,6 +500,21 @@ public class GenMapperService {
         retList.add(GenCodeUtil.THREE_RETRACT + "<set>");
         retList.add(GenCodeUtil.FOUR_RETRACT + "<include refid=\"batchSet\"/>");
         retList.add(GenCodeUtil.THREE_RETRACT + "</set>");
+        retList.add(GenCodeUtil.TWO_RETRACT + "</foreach>");
+        retList.add(GenCodeUtil.ONE_RETRACT + "</insert>");
+        return retList;
+    }
+
+    private static List<String> genBatchUpdateMethod(OnePojoInfo onePojoInfo) {
+        List<String> retList = Lists.newArrayList();
+        String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getTableName());
+        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"batchUpdate\">");
+        retList.add(GenCodeUtil.TWO_RETRACT + "<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\";\">");
+        retList.add(GenCodeUtil.THREE_RETRACT + "Update " + tableName);
+        retList.add(GenCodeUtil.THREE_RETRACT + "<set>");
+        retList.add(GenCodeUtil.FOUR_RETRACT + "<include refid=\"batchSet\"/>");
+        retList.add(GenCodeUtil.THREE_RETRACT + "</set>");
+        retList.add(GenCodeUtil.THREE_RETRACT + "WHERE id = #{item.id}\n");
         retList.add(GenCodeUtil.TWO_RETRACT + "</foreach>");
         retList.add(GenCodeUtil.ONE_RETRACT + "</insert>");
         return retList;
