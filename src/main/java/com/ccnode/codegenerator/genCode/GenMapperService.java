@@ -508,7 +508,7 @@ public class GenMapperService {
     private static List<String> genBatchUpdateMethod(OnePojoInfo onePojoInfo) {
         List<String> retList = Lists.newArrayList();
         String tableName = GenCodeUtil.getUnderScore(onePojoInfo.getTableName());
-        retList.add(GenCodeUtil.ONE_RETRACT + "<insert id=\"batchUpdate\">");
+        retList.add(GenCodeUtil.ONE_RETRACT + "<update id=\"batchUpdate\">");
         retList.add(GenCodeUtil.TWO_RETRACT + "<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\";\">");
         retList.add(GenCodeUtil.THREE_RETRACT + "Update " + tableName);
         retList.add(GenCodeUtil.THREE_RETRACT + "<set>");
@@ -516,7 +516,7 @@ public class GenMapperService {
         retList.add(GenCodeUtil.THREE_RETRACT + "</set>");
         retList.add(GenCodeUtil.THREE_RETRACT + "WHERE id = #{item.id}\n");
         retList.add(GenCodeUtil.TWO_RETRACT + "</foreach>");
-        retList.add(GenCodeUtil.ONE_RETRACT + "</insert>");
+        retList.add(GenCodeUtil.ONE_RETRACT + "</update>");
         return retList;
     }
 
