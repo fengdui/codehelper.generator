@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.commons.io.IOUtils.writeLines;
@@ -234,7 +235,7 @@ public class OnePojoInfoHelper {
 
     public static void parseFiles(OnePojoInfo onePojoInfo, GenCodeResponse response) {
         onePojoInfo.setFiles(Lists.newArrayList());
-        for (FileType fileType : FileType.values()) {
+        for (FileType fileType : Arrays.asList(FileType.MAPPER)) {
             if(fileType == FileType.NONE){
                 continue;
             }
