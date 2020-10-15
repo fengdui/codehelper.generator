@@ -195,7 +195,7 @@ public class GenMapperService {
         posPair = ReplaceUtil
                 .getPos(listInfo.getFullList(), "<update id=\""+ "batchUpdate" +"\"", "</update>", new MapperCondition());
         listInfo.setPos(posPair);
-        listInfo.setNewSegments(genBatchInsertMethod(onePojoInfo));
+        listInfo.setNewSegments(genBatchUpdateMethod(onePojoInfo));
         ReplaceUtil.merge(listInfo, new EqualCondition<String>() {
             @Override
             public boolean isEqual(String o1, String o2) {

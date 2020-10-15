@@ -90,9 +90,9 @@ public class InitialService {
             return file.getAbsolutePath();
         }
         if(StringUtils.isBlank(configDir)){
-            return pojoDirPath + response.getPathSplitter() +pojoName + fileSuffix;
+            return pojoDirPath + response.getPathSplitter() +GenCodeUtil.getUnderScore(pojoName) + fileSuffix;
         }
-        return projectPath + configDir + response.getPathSplitter() +pojoName + fileSuffix;
+        return projectPath + configDir + response.getPathSplitter() +GenCodeUtil.getUnderScore(pojoName) + fileSuffix;
     }
 
 }
